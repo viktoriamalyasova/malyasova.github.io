@@ -16,3 +16,5 @@ github_username:  malyasova
 
 # Build settings
 markdown: kramdown
+
+theme: jekyll-theme-cayman
