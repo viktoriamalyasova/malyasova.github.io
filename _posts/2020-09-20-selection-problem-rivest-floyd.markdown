@@ -49,7 +49,7 @@ def rivest_floyd(A, left, right, k):
             S = C2 * math.exp(2/3 * Z) #sample size
             SD = C3 * math.sqrt(Z * S * (N - S) / N) * math.copysign(1, I - N/2)
             #select subsample such that kth element lies between newleft and newright most of the time
-            newleft = max(left, k - int(I * S / N + SD))
+            newleft = max(left, k - int(I * S / N - SD))
             newright = min(right, k + int((N - I) * S / N + SD))
             rivest_floyd(A, newleft, newright, k)
         A[left], A[k] = A[k], A[left]
