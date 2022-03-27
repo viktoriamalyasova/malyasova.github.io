@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Selection Problem: Rivest-Floyd algorithm"
+title:  "Solving the Selection Problem with the Rivest-Floyd algorithm"
 date:   2020-09-20 14:17:28 +0300
 categories: algorithms
 ---

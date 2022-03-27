@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Selection Problem: Heap"
+title:  "Solving the Selection Problem using a Heap"
 date:   2020-09-06 14:17:28 +0300
 categories: data_structures
 ---
@@ -9,12 +9,16 @@ categories: data_structures
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
 
-In this post, I am going to introduce the **heap** data structure, and use it solve the **selection problem**:
-`given an array of length n, and an integer $$k \le n$$, return the kth largest number in the array.`
+In this post, I am going to describe the heap data structure, and use it solve the **selection problem**:
 
-Why not just sort the array? We could do that, but that would take $$O (n \log n)$$ time; with the help of a heap, we can do it faster. I'll explain two ways to do it, in either $$O (n + k \log k) $$ time, or $$O (k + (n-k) \log k)$$ time.
+> given an array of length n, and an integer $$k \le n$$, return the kth largest number in the array.
 
-A **Max Heap** is a binary tree satisfying two properties:
+An obvious solution would be to sort the array and take the kth element. The time complexity of this solution is $$O (n \log n)$$; 
+with the help of a heap, we can do it faster. I'll describe two ways to do it, in either $$O (n + k \log k) $$ time, or $$O (k + (n-k) \log k)$$ time.
+
+A Max Heap
+--------------
+A Max Heap is a binary tree satisfying two properties:
 
 1. Shape property: it is a *complete binary tree*, meaning that all levels of the tree, except possibly the last one (deepest) are fully filled, and, if the last level of the tree is not complete, the nodes of that level are filled from left to right.
 2. Heap property: each node's value is greater than or equal to its children's values. 
@@ -117,11 +121,16 @@ class MaxHeap:
         return ans
 {%endhighlight%}
 
-Now that we understand how a heap works, we are going to solve the selection problem using [heapq module](https://docs.python.org/3/library/heapq.html) from Python standard library. This module implements a min heap; if we ever need a max heap, we can just multiply all elements by -1.
+Solving the selection problem
+-----------------------------
+In Python, a min heap is implemented in a [heapq module](https://docs.python.org/3/library/heapq.html) from Python standard library. 
+A min heap can simulate a max heap if we multiply all elements by -1.
 
 Back to our problem: given an array of length n, and an integer $$k \le n$$, return the kth largest number in the array.
 
-A popular [Leetcode](https://leetcode.com/problems/kth-largest-element-in-an-array/) solution is to create a min heap to store k largest elements as we go through the array. It takes $$O(k)$$ time create a heap out of the first k elements, and (in the worst case) $$O(\log k)$$ to deal with each of the remaining $$n-k$$ elements, so this algorithm takes $$O(k + (n-k) \log k)$$ time:
+One solution is to create a min heap to store k largest elements as we go through the array. It takes $$O(k)$$ time create a heap
+ out of the first k elements, and (in the worst case) $$O(\log k)$$ to deal with each of the remaining $$n-k$$ elements, 
+ so this algorithm takes $$O(k + (n-k) \log k)$$ time:
 
 {%highlight python%}
 import heapq
@@ -134,7 +143,7 @@ def findKthLargest(nums: List[int], k: int) -> int:
     return heap[0]
 {%endhighlight%}
 
-This is basically what heapq.nlargest function does, except it also sorts the output, and we don't need that.
+This is basically what heapq.nlargest function does, except that it also sorts the output, and we don't need that.
 
 We could solve this problem differently:
 
@@ -157,9 +166,14 @@ def findKthLargest(nums: List[int], k: int) -> int:
             heapq.heappush(s, (x[2*ind+2], 2*ind+2))
     return -s[0][0]
 {%endhighlight%}
-This algorithm takes $$O(n + k\log k)$$ time, and $$O(n + k)$$ additional space if we're not allowed to modify the given array. Which one is faster depends on values of k and n, and on constants in the big O. For Leetcode challenge, the first one was faster.
+This algorithm takes $$O(n + k\log k)$$ time, and $$O(n + k)$$ additional space if we are not allowed to modify the given array. 
+Which one is faster depends on values of k and n, and on constants in the big O. For Leetcode challenge, the first one was faster.
 
-The second algorithm was proposed by Frederickson as a first step to his more complicated algorithm that can select a kth element from a heap in $$O(k)$$ time[2]. While it has theoretical significance (it is the asymptotically optimal algorithm for selecting kth element from a heap), Frederickson's algorithm is rarely (if ever?) used in practice since, as we'll see in the [next post]({% post_url 2020-09-13-selection-problem-quickselect %}), selecting the kth element from an array can be done in $$O(n)$$ worst-case time.
+The second algorithm was proposed by Frederickson as a first step to his more complicated algorithm that can select a kth element 
+from a heap in $$O(k)$$ time[2]. Using Frederickson's algorithm, we could solve the selection problem in O(n+k) time. 
+That would be an overly complicated and suboptimal solution to the problem, though, because in
+ the [next post]({% post_url 2020-09-13-selection-problem-quickselect %}) we will see that selecting the kth element from an array can be 
+ done in $$O(n)$$ worst-case time.
 
 Resources: 
 

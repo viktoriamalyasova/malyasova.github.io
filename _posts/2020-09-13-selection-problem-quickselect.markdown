@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Selection Problem: Quickselect"
+title:  "Solving the Selection Problem with the Quickselect algorithm"
 date:   2020-09-13 14:17:28 +0300
 categories: algorithms
 ---
