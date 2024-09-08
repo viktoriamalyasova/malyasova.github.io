@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Solving the Selection Problem using a Heap</title>
+  <meta name="description" content="">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/data_structures/2020/09/06/selection-problem-heap.html">
+  <link rel="alternate" type="application/rss+xml" title="Viktoriya Malyasova" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Viktoriya Malyasova</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Solving the Selection Problem using a Heap</h1>
+    <p class="post-meta"><time datetime="2020-09-06T04:17:28-07:00" itemprop="datePublished">Sep 6, 2020</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <!-- Mathjax Support -->
+<script type="text/javascript" async="" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<p>In this post, I am going to describe the heap data structure, and use it solve the <strong>selection problem</strong>:</p>
+
+<blockquote>
+  <p>given an array of length n, and an integer \(k \le n\), return the kth largest number in the array.</p>
+</blockquote>
+
+<p>An obvious solution would be to sort the array and take the kth element. The time complexity of this solution is \(O (n \log n)\); 
+with the help of a heap, we can do it faster. I’ll describe two ways to do it, in either \(O (n + k \log k)\) time, or \(O (k + (n-k) \log k)\) time.</p>
+
+<h2 id="a-max-heap">A Max Heap</h2>
+<p>A Max Heap is a binary tree satisfying two properties:</p>
+
+<ol>
+  <li>Shape property: it is a <em>complete binary tree</em>, meaning that all levels of the tree, except possibly the last one (deepest) are fully filled, and, if the last level of the tree is not complete, the nodes of that level are filled from left to right.</li>
+  <li>Heap property: each node’s value is greater than or equal to its children’s values.</li>
+</ol>
+
+<p><img src="/assets/maxheap.png" alt="Max Heap" /></p>
+
+<p>Replacing “greater” with “smaller” in this definition results in a Min Heap:</p>
+
+<p><img src="/assets/minheap.png" alt="Min Heap" /></p>
+
+<p>A Max Heap of \(n\) elements can be created in \(O(n)\) time and allows to:</p>
+
+<ul>
+  <li>find maximum in \(O(1)\) time</li>
+  <li>pop the maximum element in \(O(\log n)\) time</li>
+  <li>insert a new element in \(O(\log n)\) time</li>
+  <li>increase a key in $$O(\log n) time</li>
+</ul>
+
+<p>Binary heaps are usually implemented as arrays, which saves the overhead cost of storing pointers to child and parent nodess. The number above the node in the picture is the corresponding index of the array. The left child of element number n will have index \(2*n+1\), the right child - \(2*n+2\), its parent - \(\lfloor (n-1)/2 \rfloor\).</p>
+
+<p><strong>Max Heap Deletion Algorithm</strong></p>
+
+<p>Step 1 − Remove root node.
+Step 2 − Move the last element of last level to root.
+Step 3 − If the inserted node is smaller than one of its children, swap it with the largest child.
+Step 4 − Repeat step 3 until Heap property holds.</p>
+
+<p><img src="/assets/heap-deletion.gif" alt="" /></p>
+
+<p><strong>Max Heap Construction Algorithm</strong></p>
+
+<p>We could insert elements one by one, but that would take \(O(n \log n)\) time.
+Instead, we “heapify” the tree from the bottom layer to the top. 
+For every node we ensure that it’s bigger than both of its children, and if it isn’t,
+we do the same thing as in the Heap Deletion algorithm: swap it with the largest child until Heap property holds.</p>
+
+<p>How long does this take?
+There are no more than n/2 nodes at the second-lowest level, n/4 at the next level, and so on.
+So the total number of swaps is no more than \(1 \frac{n}{2} + 2 \frac{n}{4} + 3 \frac{n}{8} + \ldots = 2n = O(n)\).</p>
+
+<p><img src="/assets/heap-construction.gif" alt="" /></p>
+
+<p><strong>Max Heap Insertion Algorithm</strong></p>
+
+<p>Step 1 − Create a new node at the end of heap.
+Step 2 − Assign new value to the node.
+Step 3 − Compare the value of this child node with its parent.
+Step 4 − If value of parent is less than child, then swap them.
+Step 5 − Repeat step 3 &amp; 4 until Heap property holds.</p>
+
+<p><img src="/assets/heap-insertion.gif" alt="" /></p>
+
+<p>Here is my implementation of a heap in Python:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">MaxHeap</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">nums</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">MaxHeapify</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">left</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">def</span> <span class="nf">right</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span>
+    <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="k">def</span> <span class="nf">MaxHeapify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="s">"""Assuming that left and right subtrees of i are
+        already heaps, heapify the subtree rooted at i"""</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">left</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">right</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">largest</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">largest</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">largest</span><span class="p">]:</span>
+            <span class="n">largest</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="k">if</span> <span class="n">largest</span> <span class="o">!=</span> <span class="n">i</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">largest</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">largest</span><span class="p">],</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">MaxHeapify</span><span class="p">(</span><span class="n">largest</span><span class="p">)</span>  
+    <span class="k">def</span> <span class="nf">IncreaseKey</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">val</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">i</span><span class="p">)]:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">i</span><span class="p">)],</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">Insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">IncreaseKey</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">ExtractMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="n">ans</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">nums</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">MaxHeapify</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ans</span></code></pre></figure>
+
+<h2 id="solving-the-selection-problem">Solving the selection problem</h2>
+<p>In Python, a min heap is implemented in a <a href="https://docs.python.org/3/library/heapq.html">heapq module</a> from Python standard library. 
+A min heap can simulate a max heap if we multiply all elements by -1.</p>
+
+<p>Back to our problem: given an array of length n, and an integer \(k \le n\), return the kth largest number in the array.</p>
+
+<p>One solution is to create a min heap to store k largest elements as we go through the array. It takes \(O(k)\) time create a heap
+ out of the first k elements, and (in the worst case) \(O(\log k)\) to deal with each of the remaining \(n-k\) elements, 
+ so this algorithm takes \(O(k + (n-k) \log k)\) time:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">heapq</span>
+<span class="k">def</span> <span class="nf">findKthLargest</span><span class="p">(</span><span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">heap</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[:</span><span class="n">k</span><span class="p">].</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">heapq</span><span class="p">.</span><span class="n">heapify</span><span class="p">(</span><span class="n">heap</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">nums</span><span class="p">[</span><span class="n">k</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;</span> <span class="n">heap</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">heapq</span><span class="p">.</span><span class="n">heapreplace</span><span class="p">(</span><span class="n">heap</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">heap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></code></pre></figure>
+
+<p>This is basically what heapq.nlargest function does, except that it also sorts the output, and we don’t need that.</p>
+
+<p>We could solve this problem differently:</p>
+
+<ol>
+  <li>Turn the whole array into a max heap, and insert its root into an auxiliary max heap.</li>
+  <li>k-1 times pop an element from the second heap, and push back its children from the first heap.</li>
+  <li>Return the root of the second heap.</li>
+</ol>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">heapq</span>
+
+<span class="k">def</span> <span class="nf">findKthLargest</span><span class="p">(</span><span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">nums</span><span class="p">]</span>
+    <span class="n">heapq</span><span class="p">.</span><span class="n">heapify</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)]</span> <span class="c1">#auxiliary heap
+</span>    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">heapq</span><span class="p">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">s</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">heapq</span><span class="p">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">heapq</span><span class="p">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></code></pre></figure>
+
+<p>This algorithm takes \(O(n + k\log k)\) time, and \(O(n + k)\) additional space if we are not allowed to modify the given array. 
+Which one is faster depends on values of k and n, and on constants in the big O. For Leetcode challenge, the first one was faster.</p>
+
+<p>The second algorithm was proposed by Frederickson as a first step to his more complicated algorithm that can select a kth element 
+from a heap in \(O(k)\) time[2]. Using Frederickson’s algorithm, we could solve the selection problem in O(n+k) time. 
+That would be an overly complicated and suboptimal solution to the problem, though, because in
+ the <a href="/algorithms/2020/09/13/selection-problem-quickselect.html">next post</a> we will see that selecting the kth element from an array can be 
+ done in \(O(n)\) worst-case time.</p>
+
+<p>Resources:</p>
+
+<p>[1] Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald L.; Stein, Clifford (2009) [1990]. Introduction to Algorithms (3rd ed.). MIT Press and McGraw-Hill. ISBN 0-262-03384-4., pp.151-169</p>
+
+<p>[2] Frederickson, Greg N. “An optimal algorithm for selection in a min-heap.” Information and Computation 104.2 (1993): 197-214.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Viktoriya Malyasova</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Viktoriya Malyasova</li>
+          <li><a href="mailto:malyasova.viktoriya@yandex.ru">malyasova.viktoriya@yandex.ru</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/malyasova"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">malyasova</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Blog about programming and machine learning
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
