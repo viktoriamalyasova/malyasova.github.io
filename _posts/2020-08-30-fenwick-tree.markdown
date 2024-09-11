@@ -103,6 +103,15 @@ There are more things that a Fenwick tree can do:
 
 Updating an element can be done by adding new value minus current value.
 {%highlight python%}
+    def update(self, i, val):
+        self.add(i, val - self.get(i))
+{% endhighlight %}
+
+- retrieve an element in $$O(\log n)$$ time.
+
+To get the value of an element, we subtract all of its children. Alternatively, we could just store the original array, taking up additional $$O(n)$$ memory, but retrieving elements in $$O(1)$$ time.
+
+{%highlight python%}
     def get(self, pos):
         ans = self.fen[pos]
         c = 1
@@ -113,13 +122,5 @@ Updating an element can be done by adding new value minus current value.
             c = c << 1
         return ans
 {%endhighlight%}
-
-- retrieve an element in $$O(\log n)$$ time.
-
-To get the value of an element, we subtract all of its children. Alternatively, we could do just store the original array, taking up $$O(n)$$ memory, but retrieving elements in $$O(1)$$ time.
-{%highlight python%}
-    def update(self, i, val):
-        self.add(i, val - self.get(i))
-{% endhighlight %}
 
 In the [next post]({% post_url 2020-09-06-selection-problem-heap %}), I'll introduce the heap data structure.
